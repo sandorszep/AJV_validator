@@ -4,18 +4,26 @@
   "properties": {
     "paths": {
       "type": "object",
-      "patternProperties": {
-        "^/(?!.*[\\$])(?!.*com\\.sap)[a-zA-Z0-9].*$": {
-          "type": "object",
-          "properties": {
-            "get": { "$ref": "get-method" },
-            "post": { "$ref": "post-method" },
-            "patch": { "$ref": "patch-method" },
-            "delete": { "$ref": "delete-method" }
+      "additionalProperties": {
+        "allOf": [
+          {
+            "if": {
+              "not": {
+                "propertyNames": { "pattern": ".*(com\\.sap|\\$)" }
+              }
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "get": { "$ref": "get-method" },
+                "post": { "$ref": "post-method" },
+                "patch": { "$ref": "patch-method" },
+                "delete": { "$ref": "delete-method" }
+              }
+            }
           }
-        }
-      },
-      "additionalProperties": true
+        ]
+      }
     }
   },
   "required": ["paths"]
