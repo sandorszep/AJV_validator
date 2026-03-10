@@ -6,10 +6,8 @@
   "properties": {
     "summary": {
       "type": "string",
-      "allOf": [
-        { "pattern": "^Deletes\\s+.*$" },
-        { "not": { "pattern": "^Remove\\b" } }
-      ]
+      "pattern": "^Deletes\\s+.*$",
+      "not": { "pattern": "^Remove\\b" }
     }
   }
 }
