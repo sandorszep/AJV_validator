@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "patch-method",
+  "type": "object",
+  "required": ["summary"],
+  "properties": {
+    "summary": {
+      "type": "string",
+      "allOf": [
+        { "pattern": "^Updates\\s+.*$" },
+        { "not": { "pattern": "^(Patch|Modify)\\b" } }
+      ]
+    }
+  }
+}
