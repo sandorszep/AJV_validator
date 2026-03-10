@@ -1,0 +1,59 @@
+name: OpenAPI Style Validation
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install AJV CLI
+        run: npm install -g ajv-cli ajv-formats
+
+      - name: Run AJV and Annotate
+        run: |
+          # Fájlok elérési útjai
+          MAIN_SCHEMA="schemas/openapi-rules.json"
+          METHODS_DIR="schemas/methods/*.json"
+          SPEC_FILE="specifications/SpecificationV1.json"
+
+          # 1. Validáció futtatása
+          # A -r kapcsolóval töltjük be az összes metódus fájlt referenciaként
+          ajv validate \
+            -s "$MAIN_SCHEMA" \
+            -r "$METHODS_DIR" \
+            -d "$SPEC_FILE" \
+            --spec=draft7 --all-errors --errors=line --verbose > validation_output.txt 2>&1 || export VALIDATION_FAILED=true
+
+          cat validation_output.txt
+
+          # 2. Hibák feldolgozása a beépített jq-val
+          ERROR_JSON=$(grep "^\[" validation_output.txt || echo "")
+
+          if [ -n "$ERROR_JSON" ]; then
+            echo "$ERROR_JSON" | jq -c '.[]' | while read -r error; do
+              IPATH=$(echo "$error" | jq -r '.instancePath')
+              MSG=$(echo "$error" | jq -r '.message')
+              DATA=$(echo "$error" | jq -r '.data // "null"')
+              
+              DECODED_PATH=$(echo "$IPATH" | sed 's/~1/\//g' | sed 's/~0/~/g')
+              PROP_NAME=$(echo "$DECODED_PATH" | awk -F/ '{print $NF}')
+              
+              LINE_NUM=$(grep -nE "\"$PROP_NAME\":\s*\"$DATA\"" "$SPEC_FILE" | head -n 1 | cut -d: -f1)
+              if [ -z "$LINE_NUM" ]; then LINE_NUM=1; fi
+              
+              echo "::error file=$SPEC_FILE,line=$LINE_NUM,title=Stílus hiba::Mező: $DECODED_PATH | Hiba: $MSG | Érték: '$DATA'"
+            done
+          fi
+
+          if [ "$VALIDATION_FAILED" = true ]; then
+            echo "A validáció sikertelen volt."
+            exit 1
+          fi
