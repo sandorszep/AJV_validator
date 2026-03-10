@@ -5,7 +5,7 @@
     "paths": {
       "type": "object",
       "patternProperties": {
-        "^(?!.*(com\\.sap|\\$)).*$": {
+        "^/(?!.*[\\$])(?!.*com\\.sap)[a-zA-Z0-9].*$": {
           "type": "object",
           "properties": {
             "get": { "$ref": "get-method" },
