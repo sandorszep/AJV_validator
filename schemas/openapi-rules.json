@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "paths": {
+      "type": "object",
+      "patternProperties": {
+        "^/.*$": {
+          "type": "object",
+          "properties": {
+            "get": { "$ref": "get-method" },
+            "post": { "$ref": "post-method" },
+            "patch": { "$ref": "patch-method" },
+            "delete": { "$ref": "delete-method" }
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": ["paths"]
+}
