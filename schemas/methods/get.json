@@ -6,10 +6,8 @@
   "properties": {
     "summary": {
       "type": "string",
-      "allOf": [
-        { "pattern": "^Returns\\s+.*$" },
-        { "not": { "pattern": "^(Read|Get|Retrieve)\\b" } }
-      ]
+      "pattern": "^Returns\\s+.*$",
+      "not": { "pattern": "^(Read|Get|Retrieve)\\b" }
     }
   }
 }

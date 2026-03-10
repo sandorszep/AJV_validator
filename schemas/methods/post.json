@@ -6,10 +6,8 @@
   "properties": {
     "summary": {
       "type": "string",
-      "allOf": [
-        { "pattern": "^Creates\\s+.*$" },
-        { "not": { "pattern": "^(Post|Insert)\\b" } }
-      ]
+      "pattern": "^Creates\\s+.*$",
+      "not": { "pattern": "^(Post|Insert)\\b" }
     }
   }
 }
