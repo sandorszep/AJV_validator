@@ -869,7 +869,7 @@
         "description": "Character-based attribute is one attribute field type. With this API, you can retrieve a list of character-based attribute values."
       },
       "post": {
-        "summary": "Creates a single character-based attribute value",
+        "summary": "Insert a single character-based attribute value",
         "tags": [
           "Attributes - Character"
         ],
