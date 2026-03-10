@@ -142,7 +142,7 @@
     },
     "/AttributePropertyRows": {
       "get": {
-        "summary": "Get a list of attribute property rows",
+        "summary": "Returns a list of attribute property rows",
         "tags": [
           "Attribute Property Rows"
         ],
