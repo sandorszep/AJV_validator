@@ -6,10 +6,8 @@
   "properties": {
     "summary": {
       "type": "string",
-      "allOf": [
-        { "pattern": "^Updates\\s+.*$" },
-        { "not": { "pattern": "^(Patch|Modify)\\b" } }
-      ]
+      "pattern": "^Updates\\s+.*$",
+      "not": { "pattern": "^(Patch|Modify)\\b" }
     }
   }
 }
