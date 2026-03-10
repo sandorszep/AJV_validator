@@ -7048,7 +7048,7 @@
     },
     "/SpecificationVersions": {
       "get": {
-        "summary": "Get a list of specification versions",
+        "summary": "Create a list of specification versions",
         "tags": [
           "Specification Versions"
         ],
