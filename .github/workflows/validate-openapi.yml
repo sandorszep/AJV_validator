@@ -25,7 +25,6 @@ jobs:
           SPEC_FILE="specifications/SpecificationV1.json"
 
           # 1. Validáció futtatása
-          # A -r kapcsolóval töltjük be az összes metódus fájlt referenciaként
           ajv validate \
             -s "$MAIN_SCHEMA" \
             -r "$METHODS_DIR" \
@@ -61,7 +60,10 @@ jobs:
       - name: Check URL Availability
         run: |
           SPEC_FILE="specifications/SpecificationV1.json"
-          URL_CHECK_FAILED=false
+          
+          # Számlálók inicializálása
+          TOTAL_CHECKED=0
+          TOTAL_FAILED=0
 
           echo "🔍 Extracting and checking URLs from $SPEC_FILE..."
           
@@ -75,8 +77,11 @@ jobs:
               continue
             fi
 
-            # HTTP HEAD kérés küldése, csak a státuszkódot kérjük vissza
-            HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}" -I -L "$url" || echo "FAILED")
+            # HTTP HEAD kérés küldése (30 mp timeout, csak státuszkód)
+            HTTP_STATUS=$(curl -m 30 -o /dev/null -s -w "%{http_code}" -I -L "$url" || echo "FAILED")
+
+            # Növeljük a vizsgált URL-ek számát
+            TOTAL_CHECKED=$((TOTAL_CHECKED + 1))
 
             if [ "$HTTP_STATUS" = "200" ]; then
               echo "✅ OK ($HTTP_STATUS): $url"
@@ -84,12 +89,30 @@ jobs:
                echo "✅ OK (Redirect $HTTP_STATUS): $url"
             else
               echo "❌ ERROR: Dead link or inaccessible ($HTTP_STATUS): $url"
-              URL_CHECK_FAILED=true
+              # Növeljük a hibás URL-ek számát
+              TOTAL_FAILED=$((TOTAL_FAILED + 1))
             fi
           done
 
+          # Eredmények kiírása a logba
+          echo ""
+          echo "========================================"
+          echo "📊 URL Ellenőrzés Eredménye:"
+          echo "Megvizsgált URL: $TOTAL_CHECKED"
+          echo "Hibás URL: $TOTAL_FAILED"
+          echo "========================================"
+
+          # Eredmények kiírása a GitHub Actions Summary képernyőre
+          echo "### 📊 OpenAPI URL Ellenőrzés Eredménye" >> $GITHUB_STEP_SUMMARY
+          echo "- **Megvizsgált URL-ek száma:** $TOTAL_CHECKED" >> $GITHUB_STEP_SUMMARY
+          if [ "$TOTAL_FAILED" -gt 0 ]; then
+            echo "- ❌ **Hibás URL-ek száma:** $TOTAL_FAILED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ✅ **Hibás URL-ek száma:** 0" >> $GITHUB_STEP_SUMMARY
+          fi
+
           # Ha volt hibás URL, a CI/CD pipeline fail-eljen
-          if [ "$URL_CHECK_FAILED" = true ]; then
-            echo "🚨 One or more URLs are invalid or returning 404."
+          if [ "$TOTAL_FAILED" -gt 0 ]; then
+            echo "🚨 A pipeline leállítva, mert $TOTAL_FAILED hibás URL található."
             exit 1
           fi
