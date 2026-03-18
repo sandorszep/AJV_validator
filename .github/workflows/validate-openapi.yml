@@ -57,3 +57,39 @@ jobs:
             echo "A validáció sikertelen volt."
             exit 1
           fi
+
+      - name: Check URL Availability
+        run: |
+          SPEC_FILE="specifications/SpecificationV1.json"
+          URL_CHECK_FAILED=false
+
+          echo "🔍 Extracting and checking URLs from $SPEC_FILE..."
+          
+          # Az összes "url" kulcs értékének kinyerése a JSON-ből (csak a http/https kezdetűeket)
+          URLS=$(jq -r '.. | .url? | select(type == "string") | select(test("^https?://"))' "$SPEC_FILE")
+
+          for url in $URLS; do
+            # Kihagyjuk azokat az URL-eket, amikben változó van (pl. https://{region}.sap.com)
+            if echo "$url" | grep -q "{"; then
+              echo "⚠️  Skipping parameterized URL: $url"
+              continue
+            fi
+
+            # HTTP HEAD kérés küldése, csak a státuszkódot kérjük vissza
+            HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}" -I -L "$url" || echo "FAILED")
+
+            if [ "$HTTP_STATUS" = "200" ]; then
+              echo "✅ OK ($HTTP_STATUS): $url"
+            elif [[ "$HTTP_STATUS" =~ ^3 ]]; then
+               echo "✅ OK (Redirect $HTTP_STATUS): $url"
+            else
+              echo "❌ ERROR: Dead link or inaccessible ($HTTP_STATUS): $url"
+              URL_CHECK_FAILED=true
+            fi
+          done
+
+          # Ha volt hibás URL, a CI/CD pipeline fail-eljen
+          if [ "$URL_CHECK_FAILED" = true ]; then
+            echo "🚨 One or more URLs are invalid or returning 404."
+            exit 1
+          fi
