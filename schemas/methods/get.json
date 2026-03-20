@@ -8,6 +8,10 @@
       "type": "string",
       "pattern": "^Returns\\s+.*$",
       "not": { "pattern": "^(Read|Get|Retrieve)\\b" }
+    },
+    "description": {
+      "type": "string",
+      "pattern": ".*\\.$"
     }
   }
 }

@@ -8,6 +8,10 @@
       "type": "string",
       "pattern": "^Deletes\\s+.*$",
       "not": { "pattern": "^Remove\\b" }
+    },
+    "description": {
+      "type": "string",
+      "pattern": ".*\\.$"
     }
   }
 }

@@ -8,6 +8,10 @@
       "type": "string",
       "pattern": "^Updates\\s+.*$",
       "not": { "pattern": "^(Patch|Modify)\\b" }
+    },
+    "description": {
+      "type": "string",
+      "pattern": ".*\\.$"
     }
   }
 }

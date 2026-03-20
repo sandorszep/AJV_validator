@@ -8,6 +8,10 @@
       "type": "string",
       "pattern": "^Creates\\s+.*$",
       "not": { "pattern": "^(Post|Insert)\\b" }
+    },
+    "description": {
+      "type": "string",
+      "pattern": ".*\\.$"
     }
   }
 }
