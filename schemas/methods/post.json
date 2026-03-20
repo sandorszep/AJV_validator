@@ -2,12 +2,16 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "post-method",
   "type": "object",
-  "required": ["summary"],
+  "required": ["summary", "description"],
   "properties": {
     "summary": {
       "type": "string",
       "pattern": "^Creates\\s+.*$",
       "not": { "pattern": "^(Post|Insert)\\b" }
+    },
+    "description": {
+      "type": "string",
+      "pattern": ".*\\.$"
     }
   }
 }
