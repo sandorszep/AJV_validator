@@ -2,12 +2,16 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "patch-method",
   "type": "object",
-  "required": ["summary"],
+  "required": ["summary", "description"],
   "properties": {
     "summary": {
       "type": "string",
       "pattern": "^Updates\\s+.*$",
       "not": { "pattern": "^(Patch|Modify)\\b" }
+    },
+    "description": {
+      "type": "string",
+      "pattern": ".*\\.$"
     }
   }
 }
