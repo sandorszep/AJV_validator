@@ -2,12 +2,16 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "get-method",
   "type": "object",
-  "required": ["summary"],
+  "required": ["summary", "description"],
   "properties": {
     "summary": {
       "type": "string",
       "pattern": "^Returns\\s+.*$",
       "not": { "pattern": "^(Read|Get|Retrieve)\\b" }
+    },
+    "description": {
+      "type": "string",
+      "pattern": ".*\\.$"
     }
   }
 }
